@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model avaliacoes {
+  ID            Int           @id @default(autoincrement())
+  OrganizacaoID Int?
+  VoluntarioID  Int?
+  Nota          Int?
+  Comentario    String?       @db.Text
+  DataAvaliacao DateTime      @db.DateTime(0)
+  organizacoes  organizacoes? @relation(fields: [OrganizacaoID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "avaliacoes_ibfk_1")
+  voluntarios   voluntarios?  @relation(fields: [VoluntarioID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "avaliacoes_ibfk_2")
+
+  @@index([OrganizacaoID], map: "OrganizacaoID")
+  @@index([VoluntarioID], map: "VoluntarioID")
+}
+
+model candidaturas {
+  ID              Int                  @id @default(autoincrement())
+  VoluntarioID    Int?
+  EventoID        Int?
+  DataCandidatura DateTime             @db.DateTime(0)
+  Estado          candidaturas_Estado? @default(Pendente)
+  voluntarios     voluntarios?         @relation(fields: [VoluntarioID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "candidaturas_ibfk_1")
+  eventos         eventos?             @relation(fields: [EventoID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "candidaturas_ibfk_2")
+
+  @@index([EventoID], map: "EventoID")
+  @@index([VoluntarioID], map: "VoluntarioID")
+}
+
+model eventos {
+  ID                        Int                 @id @default(autoincrement())
+  OrganizacaoID             Int?
+  Nome                      String              @db.VarChar(100)
+  Data                      DateTime            @db.Date
+  Hora                      DateTime            @db.Time(0)
+  Local                     String              @db.VarChar(255)
+  NumVoluntariosNecessarios Int
+  candidaturas              candidaturas[]
+  organizacoes              organizacoes?       @relation(fields: [OrganizacaoID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "eventos_ibfk_1")
+  horasvoluntariado         horasvoluntariado[]
+
+  @@index([OrganizacaoID], map: "OrganizacaoID")
+}
+
+model horasvoluntariado {
+  ID               Int          @id @default(autoincrement())
+  VoluntarioID     Int?
+  EventoID         Int?
+  HorasRegistradas Decimal      @db.Decimal(5, 2)
+  DataRegistro     DateTime     @db.DateTime(0)
+  Atividades       String?      @db.Text
+  voluntarios      voluntarios? @relation(fields: [VoluntarioID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "horasvoluntariado_ibfk_1")
+  eventos          eventos?     @relation(fields: [EventoID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "horasvoluntariado_ibfk_2")
+
+  @@index([EventoID], map: "EventoID")
+  @@index([VoluntarioID], map: "VoluntarioID")
+}
+
+model logalteracoes {
+  ID             Int      @id @default(autoincrement())
+  TabelaAtingida String?  @db.VarChar(100)
+  Operacao       String?  @db.VarChar(10)
+  RegistroID     Int?
+  DataHora       DateTime @default(now()) @db.Timestamp(0)
+}
+
+model organizacoes {
+  ID         Int          @id @default(autoincrement())
+  Nome       String       @db.VarChar(100)
+  CNPJ       String       @unique(map: "CNPJ") @db.VarChar(18)
+  Telefone   String       @db.VarChar(20)
+  Email      String       @unique(map: "Email") @db.VarChar(100)
+  Endereco   String       @db.VarChar(255)
+  Senha      String       @db.VarChar(255)
+  avaliacoes avaliacoes[]
+  eventos    eventos[]
+}
+
+model voluntarios {
+  ID                Int                 @id @default(autoincrement())
+  Nome              String              @db.VarChar(100)
+  Telefone          String              @db.VarChar(20)
+  Email             String              @unique(map: "Email") @db.VarChar(100)
+  CPF               String              @unique(map: "CPF") @db.VarChar(14)
+  Endereco          String              @db.VarChar(255)
+  DataNascimento    DateTime            @db.Date
+  Motivo            String?             @db.Text
+  Senha             String              @db.VarChar(255)
+  avaliacoes        avaliacoes[]
+  candidaturas      candidaturas[]
+  horasvoluntariado horasvoluntariado[]
+}
+
+enum candidaturas_Estado {
+  Pendente
+  Aceito
+  Rejeitado
+}
