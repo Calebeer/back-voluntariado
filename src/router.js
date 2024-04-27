@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const criar  = require('../src/controllers/user.controller');
+const taskController  = require('../src/controllers/user.controller');
+const middlewareOrganizacao = require('../src/middlewares/organizacaoMiddleware')
+
 
 const teste = (req,res)=>{res.send('Hello World!');}
 
 router.use(express.json());
 
-router.post('/criar', criar);
-router.get('/',teste );
+router.post('/voluntario', taskController.criaVoluntario);
+router.post('/organizacao',taskController.criaOrganizacao );
 
 module.exports = router;
