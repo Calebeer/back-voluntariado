@@ -15,16 +15,6 @@ const prisma = require("../services/prisma")
 }
 
 const criarOrganizacao = async (data) => {
-    // const {Nome, Cnpj, Telefone, Email, Endereco, Senha} = data;
-    //
-    // const emailEncontrado = await prisma.organizacoes.findFirst({
-    //     where:{
-    //         Email
-    //     }
-    // });
-    //
-    // console.log(emailEncontrado)
-    // console.log(Email)
     const organizacao = await prisma.organizacoes.create({
         data:data
     });
@@ -32,7 +22,17 @@ const criarOrganizacao = async (data) => {
 
 }
 
+const listaTodosVoluntarios = async (req, res) => {
+
+    const busca = await prisma.voluntarios.findMany(({})).then((voluntarios)=>{
+            return res.status(200).send(voluntarios);
+        })
+        return res.status(200).send(busca);
+}
+
+
 module.exports = {
     criarVoluntario,
-    criarOrganizacao
+    criarOrganizacao,
+    listaTodosVoluntarios
 }

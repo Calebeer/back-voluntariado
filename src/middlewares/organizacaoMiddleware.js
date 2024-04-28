@@ -1,6 +1,5 @@
 const  { z } = require('zod');
 const { cpf } = require('cpf-cnpj-validator')
-const taskController = require('../controllers/user.controller');
 
 const validacaoOrganizacao = (req, res, next) => {
     try{
@@ -8,6 +7,7 @@ const validacaoOrganizacao = (req, res, next) => {
         const schema = z.object({
             Nome:z.string().min(1).max(255),
             CNPJ:z.string().min(6).max(255).transform(arg=>{
+                console.log(cpf.isValid(arg))
                 return cpf.isValid(arg)
             }),
             Telefone:z.string().min(6).max(255),
@@ -19,8 +19,9 @@ const validacaoOrganizacao = (req, res, next) => {
         next()
     }
     catch(err){
+        console.error("Erro na validação da organização:", err);
         const mensagemErro = err.issues.map(issues => issues.message)
-        return res.status(500).send({err:mensagemErro})
+        return res.status(500).send({err:mensagemErro});
     }
 }
 
