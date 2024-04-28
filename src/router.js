@@ -11,7 +11,7 @@ router.use(express.json());
 
 router.post('/voluntario', taskController.criaVoluntario);
 router.post('/organizacao',taskController.criaOrganizacao );
-router.get('/voluntario',taskController.listaTodosVoluntarios);
+router.get('/voluntario',verificacaoJwt, taskController.listaVoluntarios);
 router.post('/login',taskController.logar);
 
 module.exports = router;

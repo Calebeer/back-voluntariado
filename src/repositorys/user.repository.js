@@ -25,9 +25,9 @@ const criarOrganizacao = async (data) => {
 const listaTodosVoluntarios = async (req, res) => {
 
     const busca = await prisma.voluntarios.findMany(({})).then((voluntarios)=>{
-            return res.status(200).send(voluntarios);
+            return voluntarios
         })
-        return res.status(200).send(busca);
+    return busca
 }
 
 

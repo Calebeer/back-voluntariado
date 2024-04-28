@@ -1,6 +1,5 @@
 const repository  = require("../repositorys/user.repository");
 const prisma = require("../services/prisma")
-const e = require("express");
 const jwt = require("jsonwebtoken");
 const jwtSecret = 'voluntariado';
 
@@ -40,7 +39,6 @@ const criaOrganizacao = async (req, res) => {
 
 }
 
-
 const logar = async(req, res) => {
     try{
         const { Email, Senha} = req.body;
@@ -59,12 +57,12 @@ const logar = async(req, res) => {
         })
 
         if(voluntarioEcontrado){
-            const token = jwt.sign({id:voluntarioEcontrado.ID,tipo:'voluntario'},jwtSecret, {expiresIn: '1h'} )
+            const token = jwt.sign({id:voluntarioEcontrado.ID,tipo:'voluntario'},jwtSecret, {expiresIn: '5h'} )
             return res.status(200).send({auth:true,token});
         }
 
         if(organizacaoEncontrado){
-            const token = jwt.sign({id:organizacaoEncontrado.ID, tipo:'organizacao'},jwtSecret, {expiresIn: '1h'} )
+            const token = jwt.sign({id:organizacaoEncontrado.ID, tipo:'organizacao'},jwtSecret, {expiresIn: '5h'} )
             return res.status(200).send({auth:true,token});
         }
 
@@ -75,8 +73,9 @@ const logar = async(req, res) => {
     }
 }
 
-const listaTodosVoluntarios = async (req, res) => {
-    const voluntarios = await repository.listaTodosVoluntarios()
+const listaVoluntarios = async (req, res) => {
+    const voluntarios = await repository.listaTodosVoluntarios(req)
+    console.log('-->',req.user)
     return res.status(200).send(voluntarios);
 }
 
@@ -86,5 +85,5 @@ module.exports = {
     criaVoluntario,
     criaOrganizacao,
     logar,
-    listaTodosVoluntarios,
+    listaVoluntarios,
 }
