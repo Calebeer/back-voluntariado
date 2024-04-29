@@ -3,7 +3,6 @@ const prisma = require("../services/prisma")
 const jwt = require("jsonwebtoken");
 const jwtSecret = 'voluntariado';
 const argon2 = require('argon2');
-const req = require("express/lib/request");
 
 const criaVoluntario = async (req, res) => {
     try{
@@ -19,7 +18,7 @@ const criaVoluntario = async (req, res) => {
 
 const criaOrganizacao = async (req, res) => {
     try{
-        const {Nome, Cnpj, Telefone, Email, Endereco, Senha} = req.body;
+        const { Cnpj, Telefone, Email} = req.body;
 
         const organizacaoEncontrado = await prisma.organizacoes.findFirst({
                 where:{
@@ -43,38 +42,38 @@ const criaOrganizacao = async (req, res) => {
 
 }
 
+
 const logar = async(req, res) => {
     try{
         const { Email, Senha} = req.body;
 
         const voluntarioEcontrado = await prisma.voluntarios.findFirst({
             where:{
-                    Email: Email,
-                    Senha: Senha
+                    Email: Email
             },
         })
 
         const organizacaoEncontrado = await prisma.organizacoes.findFirst({
             where:{
-                    Email:Email,
-                    Senha:Senha
+                    Email:Email
             },
         })
 
+        //aqui está sendo verificado a hash e é feito uma validação pra ver se bate com a senha que o usuário digitou
+        const verificaHash = await argon2.verify(req.hash,Senha)
 
-            if(voluntarioEcontrado){
+        //Aqui ele verifica se o email do voluntario foi encontrado e se a senha bate com a hash, e é gerado o Token
+            if(voluntarioEcontrado && verificaHash){
                 const token = jwt.sign({id:voluntarioEcontrado.ID,tipo:'voluntario'},jwtSecret, {expiresIn: '5h'} )
                 return res.status(200).send({auth:true,token});
             }
 
-            if(organizacaoEncontrado){
+            if(organizacaoEncontrado && verificaHash){
                 const token = jwt.sign({id:organizacaoEncontrado.ID, tipo:'organizacao'},jwtSecret, {expiresIn: '5h'} )
                 return res.status(200).send({auth:true,token});
             }
 
-
         return res.status(400).send({error:"Email ou senha inválidos"});
-
     }catch(e){
         return res.status(500).send({error:e});
     }
