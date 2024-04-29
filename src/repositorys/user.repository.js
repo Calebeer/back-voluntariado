@@ -1,14 +1,18 @@
 const prisma = require("../services/prisma")
+const argon2 = require("argon2");
 
 // prisma.voluntarios.findMany(({})).then((r)=>{
 //     console.log(r)
 // })
 
  const criarVoluntario = async (data) => {
-   const voluntario = await prisma.voluntarios.create({
+     const hash = await argon2.hash(data.Senha)
+
+     const voluntario = await prisma.voluntarios.create({
         data: {
             ...data,
-            DataNascimento:new Date(data.DataNascimento)
+            DataNascimento:new Date(data.DataNascimento),
+            Senha:hash
         }
     });
     return voluntario;

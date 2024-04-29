@@ -2,6 +2,8 @@ const repository  = require("../repositorys/user.repository");
 const prisma = require("../services/prisma")
 const jwt = require("jsonwebtoken");
 const jwtSecret = 'voluntariado';
+const argon2 = require('argon2');
+const req = require("express/lib/request");
 
 const criaVoluntario = async (req, res) => {
     try{
@@ -12,6 +14,8 @@ const criaVoluntario = async (req, res) => {
         return res.status(400).send({error: e});
     }
 }
+
+
 
 const criaOrganizacao = async (req, res) => {
     try{
@@ -42,6 +46,7 @@ const criaOrganizacao = async (req, res) => {
 const logar = async(req, res) => {
     try{
         const { Email, Senha} = req.body;
+
         const voluntarioEcontrado = await prisma.voluntarios.findFirst({
             where:{
                     Email: Email,
@@ -56,15 +61,17 @@ const logar = async(req, res) => {
             },
         })
 
-        if(voluntarioEcontrado){
-            const token = jwt.sign({id:voluntarioEcontrado.ID,tipo:'voluntario'},jwtSecret, {expiresIn: '5h'} )
-            return res.status(200).send({auth:true,token});
-        }
 
-        if(organizacaoEncontrado){
-            const token = jwt.sign({id:organizacaoEncontrado.ID, tipo:'organizacao'},jwtSecret, {expiresIn: '5h'} )
-            return res.status(200).send({auth:true,token});
-        }
+            if(voluntarioEcontrado){
+                const token = jwt.sign({id:voluntarioEcontrado.ID,tipo:'voluntario'},jwtSecret, {expiresIn: '5h'} )
+                return res.status(200).send({auth:true,token});
+            }
+
+            if(organizacaoEncontrado){
+                const token = jwt.sign({id:organizacaoEncontrado.ID, tipo:'organizacao'},jwtSecret, {expiresIn: '5h'} )
+                return res.status(200).send({auth:true,token});
+            }
+
 
         return res.status(400).send({error:"Email ou senha inválidos"});
 
