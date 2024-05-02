@@ -7,6 +7,7 @@ const argon2 = require('argon2');
 const criaVoluntario = async (req, res) => {
     try{
         const user = await repository.criarVoluntario(req.body);
+        console.log(user)
         res.status(200).send(user);
     }catch(e){
         console.error(e);
@@ -85,11 +86,20 @@ const listaVoluntarios = async (req, res) => {
     return res.status(200).send(voluntarios);
 }
 
-
+const criarEvento = async(req, res) => {
+    try{
+        const criaEvento = await repository.criarEvento(req.body);
+        return res.status(200).send(criaEvento);
+    }catch(e){
+        console.log(e)
+        return res.status(400).send({error:e});
+    }
+}
 
 module.exports = {
     criaVoluntario,
     criaOrganizacao,
     logar,
     listaVoluntarios,
+    criarEvento
 }

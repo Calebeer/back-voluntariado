@@ -16,15 +16,12 @@ try{
         }
     })
 
-
-
     if(econtraHashVoluntario){
           req.hash =econtraHashVoluntario.Senha ;
     }
     if(econtraHashOrganizacao){
           req.hash = econtraHashOrganizacao.Senha;
     }
-
 
     next()
 }catch(err){
