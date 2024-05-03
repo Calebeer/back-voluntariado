@@ -1,10 +1,6 @@
 const prisma = require("../services/prisma")
 const argon2 = require("argon2");
-const dateTime = require("datatime")
-const dayjs = require('dayjs');
-const utc = require('dayjs/plugin/utc');
 const moment = require('moment-timezone');
-const  { z } = require('zod');
 
 // prisma.eventos.findMany(({})).then((r)=>{
 //     console.log(r)
@@ -36,10 +32,10 @@ const criarOrganizacao = async (data) => {
 }
 
 const listaTodosVoluntarios = async (req, res) => {
-    const busca = await prisma.voluntarios.findMany(({})).then((voluntarios)=>{
+    const buscaVoluntarios = await prisma.voluntarios.findMany(({})).then((voluntarios)=>{
             return voluntarios
         })
-    return busca
+    return buscaVoluntarios
 }
 
 const criarEvento = async(data) => {
@@ -49,6 +45,17 @@ const criarEvento = async(data) => {
 
     const dataBrasilInicio = dataBrasil.startOf('day').format();
     const dataBrasilFim = dataBrasil.endOf('day').format();
+
+
+    //Aqui está sendo verificado a data, se o usuário está colocando a data de um dia anterior etc...
+    const dataAtual = moment().tz('America/Sao_Paulo').format('YYYY-MM-DD');
+    const dataEscolhida = moment(data.Data).tz('America/Sao_Paulo').format('YYYY-MM-DD');
+
+    if(dataAtual > dataEscolhida){
+        return { message:"Data inválida." }
+    }
+    ///////
+
 
     const validaDataEvento = await prisma.eventos.findFirst({
         where:{
