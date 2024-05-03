@@ -3,6 +3,7 @@ const prisma = require("../services/prisma")
 const jwt = require("jsonwebtoken");
 const jwtSecret = 'voluntariado';
 const argon2 = require('argon2');
+const userRepository = require("../repositorys/user.repository");
 
 const criaVoluntario = async (req, res) => {
     try{
@@ -96,10 +97,21 @@ const criarEvento = async(req, res) => {
     }
 }
 
+const criarCandidatura = async (req, res) => {
+    try{
+        const criaCandidatura = await userRepository.criarCandidatura(req.body);
+        return res.status(200).send(criaCandidatura);
+    }catch(e){
+        console.log(e)
+        return res.status(400).send({error:e});
+    }
+}
+
 module.exports = {
     criaVoluntario,
     criaOrganizacao,
     logar,
     listaVoluntarios,
-    criarEvento
+    criarEvento,
+    criarCandidatura
 }

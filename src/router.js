@@ -14,5 +14,6 @@ router.post('/organizacao',taskController.criaOrganizacao );
 router.get('/voluntario',verificacaoJwt, taskController.listaVoluntarios);
 router.post('/login',verificaHash,taskController.logar);
 router.post('/criarEvento',taskController.criarEvento);
+router.post('/candidatura',taskController.criarCandidatura);
 
 module.exports = router;

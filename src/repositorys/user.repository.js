@@ -31,7 +31,7 @@ const criarOrganizacao = async (data) => {
 
 }
 
-const listaTodosVoluntarios = async (req, res) => {
+const listaTodosVoluntarios = async () => {
     const buscaVoluntarios = await prisma.voluntarios.findMany(({})).then((voluntarios)=>{
             return voluntarios
         })
@@ -40,12 +40,12 @@ const listaTodosVoluntarios = async (req, res) => {
 
 const criarEvento = async(data) => {
 
+     //Aqui está sendo pegado a hora do banco que está em UTC e transformada para hora de São Paulo
      const dataHoraBrasil = moment(data.Data).tz('America/Sao_Paulo').format();
      const dataBrasil  = moment(data.Data).tz('America/Sao_Paulo')
 
     const dataBrasilInicio = dataBrasil.startOf('day').format();
     const dataBrasilFim = dataBrasil.endOf('day').format();
-
 
     //Aqui está sendo verificado a data, se o usuário está colocando a data de um dia anterior etc...
     const dataAtual = moment().tz('America/Sao_Paulo').format('YYYY-MM-DD');
@@ -55,7 +55,6 @@ const criarEvento = async(data) => {
         return { message:"Data inválida." }
     }
     ///////
-
 
     const validaDataEvento = await prisma.eventos.findFirst({
         where:{
@@ -82,13 +81,74 @@ const criarEvento = async(data) => {
         return {erro:"Evento já cadastrado nessa data"};
     }
 
-     const inserido = await prisma.eventos.create({
+     const eventoInserido = await prisma.eventos.create({
          data:{
              ...data,
              Data:new Date(data.Data),
          }
      })
-    return inserido || validaDataEvento ||  quantidadeDeEventosDia;
+    return eventoInserido;
+}
+
+// prisma.candidaturas.findMany({
+//     include:{
+//         eventos:true,
+//         voluntarios:true
+//
+//     }
+// }).then((r)=>{
+//     console.log(r)
+// })
+
+
+// const encontra = await prisma.
+
+
+prisma.candidaturas.findMany({
+    where: {
+        VoluntarioID: 18,
+    }
+}).then((e)=>{
+    console.log(e)
+})
+
+
+const criarCandidatura = async(data) => {
+
+    const dataHoraBrasil = moment(data.DataCandidatura).tz('America/Sao_Paulo').format();
+
+     //AQUI VAI SER VERIFICADO SE O USUÁRIO JÁ ESTÁ CADASTRADO NO EVENTO;
+    const usuarioJaCadastradoNoEvento  = await prisma.candidaturas.findFirst({
+        where:{
+            VoluntarioID:data.VoluntarioID,
+            EventoID:data.EventoID,
+        }
+    })
+
+    if(usuarioJaCadastradoNoEvento){
+        return {message:"você já está cadastrado nesse evento."}
+    }
+
+    //AQUI VAI SER VERIFICADO SE O USUÁRIO JÁ ESTÁ CADASTRADO EM ALGUM EVENTO NO MESMA DATA
+    const usuarioCadastradoNoMesmoHorario = await prisma.candidaturas.findFirst({
+        where:{
+            VoluntarioID:data.VoluntarioID,
+        },
+        include:{
+            eventos:true
+        }
+    })
+
+    // console.log(usuarioCadastradoNoMesmoHorario)
+
+    const candidatura = await prisma.candidaturas.create({
+        data: {
+            ...data,
+            DataCandidatura: new Date(data.DataCandidatura),
+            Estado: "Pendente"
+        }
+    })
+    return candidatura;
 }
 
 module.exports = {
@@ -96,4 +156,5 @@ module.exports = {
     criarOrganizacao,
     listaTodosVoluntarios,
     criarEvento,
+    criarCandidatura
 }
