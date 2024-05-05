@@ -25,14 +25,15 @@ model candidaturas {
   ID              Int                  @id @default(autoincrement())
   VoluntarioID    Int?
   EventoID        Int?
-  DataCandidatura DateTime             @db.DateTime(0)
   Estado          candidaturas_Estado? @default(Pendente)
+  createdAt       DateTime             @default(now()) // Adicionando o campo createdAt
   voluntarios     voluntarios?         @relation(fields: [VoluntarioID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "candidaturas_ibfk_1")
   eventos         eventos?             @relation(fields: [EventoID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "candidaturas_ibfk_2")
 
   @@index([EventoID], map: "EventoID")
   @@index([VoluntarioID], map: "VoluntarioID")
 }
+
 
 model eventos {
   ID                        Int                 @id @default(autoincrement())

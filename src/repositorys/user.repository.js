@@ -63,7 +63,7 @@ const criarEvento = async(data) => {
         }
     })
 
-    const quantidadeDeEventosDia = await prisma.eventos.findMany({
+    const quantidadeDeEventosDia = await prisma.eventos.count({
         where:{
             OrganizacaoID:data.OrganizacaoID,
                 Data:{
@@ -73,7 +73,7 @@ const criarEvento = async(data) => {
         }
     })
 
-    if(quantidadeDeEventosDia.length >= 3){
+    if(quantidadeDeEventosDia >= 3){
         return {message:"Uma organização pode criar somente 3 eventos por dia."}
     }
 
@@ -90,34 +90,45 @@ const criarEvento = async(data) => {
     return eventoInserido;
 }
 
+
 // prisma.candidaturas.findMany({
-//     include:{
-//         eventos:true,
-//         voluntarios:true
-//
+//     where: {
+//         EventoID: 74,
+//     },
+//     include: {
+//         eventos: true
 //     }
-// }).then((r)=>{
-//     console.log(r)
+// }).then((resultados) => {
+//         const eventosAssociados = resultados.map((resultado) => resultado.eventos);
+//         console.log(eventosAssociados[0].NumVoluntariosNecessarios);
+//     })
+
+
+// prisma.candidaturas.count({
+//     where: {
+//         EventoID:74,
+//     },include:{
+//         eventos:true
+//     }
+// }).then((resultados)=>{
+//     const eventosAssociados = resultados.map((resultado) => resultado.eventos);
+//     console.log(eventosAssociados)
 // })
 
 
-// const encontra = await prisma.
-
-
-prisma.candidaturas.findMany({
-    where: {
-        VoluntarioID: 18,
-    }
-}).then((e)=>{
-    console.log(e)
-})
+//
+// prisma.eventos.findUnique({
+//     where:{
+//     ID:74
+//     }
+// }).then((resultados)=>{
+//     console.log(resultados.NumVoluntariosNecessarios)
+// })
 
 
 const criarCandidatura = async(data) => {
 
-    const dataHoraBrasil = moment(data.DataCandidatura).tz('America/Sao_Paulo').format();
-
-     //AQUI VAI SER VERIFICADO SE O USUÁRIO JÁ ESTÁ CADASTRADO NO EVENTO;
+    //AQUI VAI SER VERIFICADO SE O USUÁRIO JÁ ESTÁ CADASTRADO NO EVENTO;
     const usuarioJaCadastradoNoEvento  = await prisma.candidaturas.findFirst({
         where:{
             VoluntarioID:data.VoluntarioID,
@@ -129,23 +140,26 @@ const criarCandidatura = async(data) => {
         return {message:"você já está cadastrado nesse evento."}
     }
 
-    //AQUI VAI SER VERIFICADO SE O USUÁRIO JÁ ESTÁ CADASTRADO EM ALGUM EVENTO NO MESMA DATA
-    const usuarioCadastradoNoMesmoHorario = await prisma.candidaturas.findFirst({
+    const eventoSemVagas = await prisma.candidaturas.count({
         where:{
-            VoluntarioID:data.VoluntarioID,
-        },
-        include:{
-            eventos:true
+            EventoID:data.EventoID,
         }
     })
 
-    // console.log(usuarioCadastradoNoMesmoHorario)
+    const quantiadeDePessoasNoEvento  = await prisma.eventos.findUnique({
+        where: {
+            ID: data.EventoID,
+        }
+    })
+
+//AQUI VAI SER VERIFICADO SE O EVENTOS JÁ ESTÁ CHEIO;
+    if(eventoSemVagas >= quantiadeDePessoasNoEvento.NumVoluntariosNecessarios){
+        return {message:"Esse evento já está cheio"}
+    }
 
     const candidatura = await prisma.candidaturas.create({
-        data: {
-            ...data,
-            DataCandidatura: new Date(data.DataCandidatura),
-            Estado: "Pendente"
+        data:{
+            ...data
         }
     })
     return candidatura;
