@@ -151,7 +151,7 @@ const criarCandidatura = async(data) => {
             ID: data.EventoID,
         }
     })
-
+    console.log(quantiadeDePessoasNoEvento)
 //AQUI VAI SER VERIFICADO SE O EVENTOS JÁ ESTÁ CHEIO;
     if(eventoSemVagas >= quantiadeDePessoasNoEvento.NumVoluntariosNecessarios){
         return {message:"Esse evento já está cheio"}
