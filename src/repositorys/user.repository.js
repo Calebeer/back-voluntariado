@@ -2,10 +2,6 @@ const prisma = require("../services/prisma")
 const argon2 = require("argon2");
 const moment = require('moment-timezone');
 
-// prisma.eventos.findMany(({})).then((r)=>{
-//     console.log(r)
-// })
-
  const criarVoluntario = async (data) => {
      const hash = await argon2.hash(data.Senha)
      const voluntario = await prisma.voluntarios.create({
@@ -90,42 +86,6 @@ const criarEvento = async(data) => {
     return eventoInserido;
 }
 
-
-// prisma.candidaturas.findMany({
-//     where: {
-//         EventoID: 74,
-//     },
-//     include: {
-//         eventos: true
-//     }
-// }).then((resultados) => {
-//         const eventosAssociados = resultados.map((resultado) => resultado.eventos);
-//         console.log(eventosAssociados[0].NumVoluntariosNecessarios);
-//     })
-
-
-// prisma.candidaturas.count({
-//     where: {
-//         EventoID:74,
-//     },include:{
-//         eventos:true
-//     }
-// }).then((resultados)=>{
-//     const eventosAssociados = resultados.map((resultado) => resultado.eventos);
-//     console.log(eventosAssociados)
-// })
-
-
-//
-// prisma.eventos.findUnique({
-//     where:{
-//     ID:74
-//     }
-// }).then((resultados)=>{
-//     console.log(resultados.NumVoluntariosNecessarios)
-// })
-
-
 const criarCandidatura = async(data) => {
 
     //AQUI VAI SER VERIFICADO SE O USUÁRIO JÁ ESTÁ CADASTRADO NO EVENTO;
@@ -165,10 +125,37 @@ const criarCandidatura = async(data) => {
     return candidatura;
 }
 
+const atualizaCandidaturaAceito = async(data) => {
+    const atualizaCandidatura = await prisma.candidaturas.update({
+        where:{
+            ID:data.ID
+        },
+        data:{
+            Estado:'Aceito'
+        }
+    })
+
+    return atualizaCandidatura;
+}
+
+const atualizaCandidaturaRejeitado = async(data) => {
+    const atualizaCandidatura = await prisma.candidaturas.update({
+        where:{
+            ID:data.ID
+        },
+        data:{
+            Estado:'Rejeitado'
+        }
+    })
+    return atualizaCandidatura;
+}
+
 module.exports = {
     criarVoluntario,
     criarOrganizacao,
     listaTodosVoluntarios,
     criarEvento,
-    criarCandidatura
+    criarCandidatura,
+    atualizaCandidaturaAceito,
+    atualizaCandidaturaRejeitado
 }

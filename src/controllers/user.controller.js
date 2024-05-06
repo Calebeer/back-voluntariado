@@ -107,11 +107,32 @@ const criarCandidatura = async (req, res) => {
     }
 }
 
+
+const atualizaEstadoVoluntarioParaAceito = async (req, res) => {
+    try{
+        const atualizaEstadoDoVoluntario = await userRepository.atualizaCandidaturaAceito(req.body);
+        return res.status(200).send(atualizaEstadoDoVoluntario);
+    }catch (e){
+        return res.status(400).send({error:e});
+    }
+}
+
+const atualizaCandidaturaParaRejeitado = async (req, res) => {
+    try{
+        const atualizaCandidaturaParaRejeitado = await userRepository.atualizaCandidaturaRejeitado(req.body);
+        return res.status(200).send(atualizaCandidaturaParaRejeitado);
+    }catch (e){
+        return res.status(400).send({error:e});
+    }
+}
+
 module.exports = {
     criaVoluntario,
     criaOrganizacao,
     logar,
     listaVoluntarios,
     criarEvento,
-    criarCandidatura
+    criarCandidatura,
+    atualizaEstadoVoluntarioParaAceito,
+    atualizaCandidaturaParaRejeitado
 }

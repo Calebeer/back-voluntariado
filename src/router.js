@@ -15,5 +15,7 @@ router.get('/voluntario',verificacaoJwt, taskController.listaVoluntarios);
 router.post('/login',verificaHash,taskController.logar);
 router.post('/criarEvento',taskController.criarEvento);
 router.post('/candidatura',taskController.criarCandidatura);
+router.put('/atualizarCandidaturaAceito',taskController.atualizaEstadoVoluntarioParaAceito);
+router.put('/atualizarCandidaturaRejeitado',taskController.atualizaCandidaturaParaRejeitado);
 
 module.exports = router;
