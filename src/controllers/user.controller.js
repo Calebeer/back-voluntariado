@@ -44,9 +44,16 @@ const criaOrganizacao = async (req, res) => {
 
 }
 
+const validate_token = async(req, res) => {
+    const { token } = req.body;
+    return res.status(200).send({
+        user: jwt.decode(token)
+    });
+}
 
 const logar = async(req, res) => {
     try{
+        console.log(req.body)
         const { Email, Senha} = req.body;
 
         const voluntarioEcontrado = await prisma.voluntarios.findFirst({
@@ -54,24 +61,36 @@ const logar = async(req, res) => {
                     Email: Email
             },
         })
-
+        console.log(voluntarioEcontrado)
         const organizacaoEncontrado = await prisma.organizacoes.findFirst({
             where:{
                     Email:Email
             },
         })
 
+        if(!voluntarioEcontrado && !organizacaoEncontrado){
+            return res.status(400).send({error:"Email ou senha inválidos"});
+        }
+
         //aqui está sendo verificado a hash e é feito uma validação pra ver se bate com a senha que o usuário digitou
         const verificaHash = await argon2.verify(req.hash,Senha)
 
         //Aqui ele verifica se o email do voluntario foi encontrado e se a senha bate com a hash, e é gerado o Token
             if(voluntarioEcontrado && verificaHash){
-                const token = jwt.sign({id:voluntarioEcontrado.ID,tipo:'voluntario'},jwtSecret, {expiresIn: '5h'} )
+                const token = jwt.sign({
+                    id:voluntarioEcontrado.ID,
+                    tipo:'voluntario',
+                    nome:voluntarioEcontrado.Nome
+                },jwtSecret,{expiresIn: '5h'} )
                 return res.status(200).send({auth:true,token});
             }
 
             if(organizacaoEncontrado && verificaHash){
-                const token = jwt.sign({id:organizacaoEncontrado.ID, tipo:'organizacao'},jwtSecret, {expiresIn: '5h'} )
+                const token = jwt.sign({
+                    id:organizacaoEncontrado.ID,
+                    tipo:'organizacao',
+                    Nome:organizacaoEncontrado.Nome
+                },jwtSecret, {expiresIn: '5h'} )
                 return res.status(200).send({auth:true,token});
             }
 
@@ -130,6 +149,7 @@ module.exports = {
     criaVoluntario,
     criaOrganizacao,
     logar,
+    validate_token,
     listaVoluntarios,
     criarEvento,
     criarCandidatura,

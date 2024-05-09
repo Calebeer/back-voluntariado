@@ -4,6 +4,27 @@ const moment = require('moment-timezone');
 
  const criarVoluntario = async (data) => {
      const hash = await argon2.hash(data.Senha)
+
+     const cpfJaCadastrado = await prisma.voluntarios.findFirst({
+         where:{
+             CPF: data.CPF
+         }
+     })
+
+     if(cpfJaCadastrado){
+         return {message:"Cpf Ja Cadastrado"}
+     }
+
+     const EmailJaCadastrado = await prisma.voluntarios.findFirst({
+         where:{
+             Email: data.Email
+         }
+     })
+
+     if(EmailJaCadastrado){
+         return {message:"Email Ja Cadastrado"}
+     }
+
      const voluntario = await prisma.voluntarios.create({
         data: {
             ...data,
@@ -11,6 +32,7 @@ const moment = require('moment-timezone');
             Senha:hash
         }
     });
+
     return voluntario;
 }
 
@@ -74,7 +96,7 @@ const criarEvento = async(data) => {
     }
 
     if(validaDataEvento){
-        return {erro:"Evento já cadastrado nessa data"};
+        return {message:"Evento já cadastrado nessa data"};
     }
 
      const eventoInserido = await prisma.eventos.create({

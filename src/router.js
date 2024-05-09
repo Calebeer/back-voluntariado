@@ -13,6 +13,7 @@ router.post('/voluntario', taskController.criaVoluntario);
 router.post('/organizacao',taskController.criaOrganizacao );
 router.get('/voluntario',verificacaoJwt, taskController.listaVoluntarios);
 router.post('/login',verificaHash,taskController.logar);
+router.post('/validate_token',taskController.validate_token);
 router.post('/criarEvento',taskController.criarEvento);
 router.post('/candidatura',taskController.criarCandidatura);
 router.put('/atualizarCandidaturaAceito',taskController.atualizaEstadoVoluntarioParaAceito);
