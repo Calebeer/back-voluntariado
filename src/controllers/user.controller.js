@@ -7,6 +7,29 @@ const userRepository = require("../repositorys/user.repository");
 
 const criaVoluntario = async (req, res) => {
     try{
+
+        const cpfJaCadastrado = await prisma.voluntarios.findFirst({
+            where:{
+                CPF: req.body.CPF
+            }
+        })
+
+
+        if(cpfJaCadastrado){
+            return res.status(400).send({message: "Cpf ja cadastrado"})
+        }
+
+
+        const EmailJaCadastrado = await prisma.voluntarios.findFirst({
+            where:{
+                Email: req.body.Email
+            }
+        })
+
+        if(EmailJaCadastrado){
+            return res.status(400).send({message: "Email ja cadastrado"})
+        }
+
         const user = await repository.criarVoluntario(req.body);
         console.log(user)
         res.status(200).send(user);
