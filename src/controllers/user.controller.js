@@ -91,7 +91,8 @@ const logar = async(req, res) => {
             },
         })
 
-        if(!voluntarioEcontrado && !organizacaoEncontrado){
+        if(!voluntarioEcontrado &&  !organizacaoEncontrado){
+            console.log('passou aqui')
             return res.status(400).send({error:"Email ou senha inválidos"});
         }
 
