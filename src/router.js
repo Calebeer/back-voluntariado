@@ -18,5 +18,6 @@ router.post('/criarEvento',taskController.criarEvento);
 router.post('/candidatura',taskController.criarCandidatura);
 router.put('/atualizarCandidaturaAceito',taskController.atualizaEstadoVoluntarioParaAceito);
 router.put('/atualizarCandidaturaRejeitado',taskController.atualizaCandidaturaParaRejeitado);
+router.put('/editarEvento',taskController.edicaoEvento);
 
 module.exports = router;

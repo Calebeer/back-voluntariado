@@ -152,6 +152,20 @@ const atualizaCandidaturaRejeitado = async(data) => {
     return atualizaCandidatura;
 }
 
+const edicaoEvento = async(data) => {
+    console.log(data)
+    const editarEvento = await prisma.eventos.update({
+        where:{
+            ID:data.ID
+        },
+        data:{
+           ...data,
+            Data:new Date(data.Data)
+        }
+    })
+    return editarEvento
+}
+
 module.exports = {
     criarVoluntario,
     criarOrganizacao,
@@ -159,5 +173,6 @@ module.exports = {
     criarEvento,
     criarCandidatura,
     atualizaCandidaturaAceito,
-    atualizaCandidaturaRejeitado
+    atualizaCandidaturaRejeitado,
+    edicaoEvento
 }

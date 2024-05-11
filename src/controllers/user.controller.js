@@ -169,6 +169,16 @@ const atualizaCandidaturaParaRejeitado = async (req, res) => {
     }
 }
 
+const edicaoEvento = async(req, res) => {
+    try{
+        const editarEvento = await userRepository.edicaoEvento(req.body);
+        return res.status(200).send(editarEvento);
+    }catch(e){
+        console.log(e)
+        return res.status(400).send({error:e});
+    }
+}
+
 module.exports = {
     criaVoluntario,
     criaOrganizacao,
@@ -178,5 +188,6 @@ module.exports = {
     criarEvento,
     criarCandidatura,
     atualizaEstadoVoluntarioParaAceito,
-    atualizaCandidaturaParaRejeitado
+    atualizaCandidaturaParaRejeitado,
+    edicaoEvento
 }
