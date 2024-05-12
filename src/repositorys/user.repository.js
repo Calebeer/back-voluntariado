@@ -166,6 +166,15 @@ const edicaoEvento = async(data) => {
     return editarEvento
 }
 
+const eventosPorOrganizacao = async(id) => {
+    const eventos = await prisma.eventos.findMany({
+        where:{
+            OrganizacaoID:id
+        }
+    })
+    return eventos
+}
+
 module.exports = {
     criarVoluntario,
     criarOrganizacao,
@@ -174,5 +183,6 @@ module.exports = {
     criarCandidatura,
     atualizaCandidaturaAceito,
     atualizaCandidaturaRejeitado,
-    edicaoEvento
+    edicaoEvento,
+    eventosPorOrganizacao
 }
