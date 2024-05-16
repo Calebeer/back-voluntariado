@@ -133,7 +133,7 @@ const listaVoluntarios = async (req, res) => {
 
 const criarEvento = async(req, res) => {
     try{
-        const criaEvento = await repository.criarEvento(req.body);
+        const criaEvento = await repository.criarEvento(req.body, req.file.key);
         return res.status(200).send(criaEvento);
     }catch(e){
         console.log(e)

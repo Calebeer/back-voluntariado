@@ -43,6 +43,7 @@ model eventos {
   Local                     String              @db.VarChar(255)
   Descricao                 String              @db.VarChar(255)
   NumVoluntariosNecessarios Int
+  fotoEvento                String              @db.VarChar(255)
   candidaturas              candidaturas[]
   organizacoes              organizacoes?       @relation(fields: [OrganizacaoID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "eventos_ibfk_1")
   horasvoluntariado         horasvoluntariado[]

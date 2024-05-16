@@ -1,6 +1,7 @@
 const prisma = require("../services/prisma")
 const argon2 = require("argon2");
 const moment = require('moment-timezone');
+const Linkfiles = require('../controllers/fileUpload.controller')
 
  const criarVoluntario = async (data) => {
      const hash = await argon2.hash(data.Senha)
@@ -36,7 +37,7 @@ const listaTodosVoluntarios = async () => {
     return buscaVoluntarios
 }
 
-const criarEvento = async(data) => {
+const criarEvento = async(data, imageUploaded) => {
 
      //Aqui está sendo pegado a hora do banco que está em UTC e transformada para hora de São Paulo
      const dataHoraBrasil = moment(data.Data).tz('America/Sao_Paulo').format();
@@ -48,7 +49,7 @@ const criarEvento = async(data) => {
     //Aqui está sendo verificado a data, se o usuário está colocando a data de um dia anterior etc...
     const dataAtual = moment().tz('America/Sao_Paulo').format('YYYY-MM-DD');
     const dataEscolhida = moment(data.Data).tz('America/Sao_Paulo').format('YYYY-MM-DD');
-
+    // console.log(Linkfiles)
     if(dataAtual > dataEscolhida){
         return { message:"Data inválida." }
     }
@@ -56,14 +57,14 @@ const criarEvento = async(data) => {
 
     const validaDataEvento = await prisma.eventos.findFirst({
         where:{
-            OrganizacaoID:data.OrganizacaoID,
+            OrganizacaoID: parseInt(data.OrganizacaoID),
             Data:dataHoraBrasil
         }
     })
 
     const quantidadeDeEventosDia = await prisma.eventos.count({
         where:{
-            OrganizacaoID:data.OrganizacaoID,
+            OrganizacaoID: parseInt(data.OrganizacaoID),
                 Data:{
                     gte:new Date(dataBrasilInicio),
                     lte:new Date(dataBrasilFim),
@@ -78,11 +79,14 @@ const criarEvento = async(data) => {
     if(validaDataEvento){
         return {message:"Evento já cadastrado nessa data"};
     }
-
+    console.log('id', parseInt(data.OrganizacaoID))
      const eventoInserido = await prisma.eventos.create({
          data:{
              ...data,
-             Data:new Date(data.Data),
+             NumVoluntariosNecessarios: parseInt(data.NumVoluntariosNecessarios),
+             OrganizacaoID: parseInt(data.OrganizacaoID),
+             Data: new Date(data.Data),
+             fotoEvento: imageUploaded
          }
      })
     return eventoInserido;
