@@ -2,4 +2,4 @@ const dotenv = require('dotenv').config()
 const app = require('./app');
 
 
-app.listen(3010,()=>console.log('rodando na porta 3010'))
+app.listen(process.env.PORT,()=>console.log(`rodando na porta ${process.env.PORT}`))

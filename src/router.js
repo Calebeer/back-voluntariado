@@ -4,9 +4,8 @@ const taskController  = require('../src/controllers/user.controller');
 const middlewareOrganizacao = require('../src/middlewares/organizacaoMiddleware')
 const verificacaoJwt = require('../src/middlewares/verificacaoJwt')
 const verificaHash = require('../src/middlewares/verificaHash')
-
-const teste = (req,res)=>{res.send('Hello World!');}
-
+// const teste = (req,res)=>{res.send('Hello World!');}
+const fileUpload = require('./controllers/fileUpload.controller')
 router.use(express.json());
 
 router.post('/voluntario', taskController.criaVoluntario);
@@ -19,6 +18,8 @@ router.post('/candidatura',taskController.criarCandidatura);
 router.put('/atualizarCandidaturaAceito',taskController.atualizaEstadoVoluntarioParaAceito);
 router.put('/atualizarCandidaturaRejeitado',taskController.atualizaCandidaturaParaRejeitado);
 router.put('/editarEvento',taskController.edicaoEvento);
-router.get('/eventosPorOrganizacao/:id',taskController.eventosPorOrganizacao);
+router.get('/eventosPorOrganizacao/',verificacaoJwt,taskController.eventosPorOrganizacao);
+router.get("/link-files/:fileId", fileUpload.linkFiles);
+router.post("/files", fileUpload.upload.single("file"), fileUpload.files);
 
 module.exports = router;

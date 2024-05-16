@@ -7,4 +7,5 @@ app.use(cors({origin:"*"}));
 app.use(router)
 app.use(express.json());
 
+
 module.exports = app;

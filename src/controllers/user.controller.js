@@ -6,7 +6,6 @@ const argon2 = require('argon2');
 const userRepository = require("../repositorys/user.repository");
 const isNumber = require("../utils/validaString");
 
-
 const criaVoluntario = async (req, res) => {
     try{
 
@@ -183,16 +182,19 @@ const edicaoEvento = async(req, res) => {
 
 const eventosPorOrganizacao = async(req, res) => {
     try{
-        const { id } = req.params
-        if(typeof id !== 'string' || !isNumber(id) ) return res.status(400).send({error: 'ID inválido'})
-
-        const eventos = await userRepository.eventosPorOrganizacao(parseInt(id))
-        return res.status(200).send(eventos);
+        const { id,tipo } = req.user
+        if (tipo === 'organizacao') {
+            const eventos = await userRepository.eventosPorOrganizacao(id)
+            return res.status(200).send(eventos);
+        }
+        return res.status(400).send({error: 'Usuário não autorizado'});
     }catch (e) {
         console.log(e)
         return res.status(400).send({error: e});
     }
 }
+
+
 
 module.exports = {
     criaVoluntario,

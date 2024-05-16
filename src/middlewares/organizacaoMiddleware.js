@@ -15,6 +15,7 @@ const validacaoOrganizacao = (req, res, next) => {
             Endereco:z.string().min(6).max(255),
             Senha:z.string().min(8,{message:"A senha deve ter no minimo 8 carcteres"}).max(255),
         })
+
         schema.parse(body);
         next()
     }
