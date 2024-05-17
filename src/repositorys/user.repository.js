@@ -39,54 +39,14 @@ const listaTodosVoluntarios = async () => {
 
 const criarEvento = async(data, imageUploaded) => {
 
-     //Aqui está sendo pegado a hora do banco que está em UTC e transformada para hora de São Paulo
-     const dataHoraBrasil = moment(data.Data).tz('America/Sao_Paulo').format();
-     const dataBrasil  = moment(data.Data).tz('America/Sao_Paulo')
-
-    const dataBrasilInicio = dataBrasil.startOf('day').format();
-    const dataBrasilFim = dataBrasil.endOf('day').format();
-
-    //Aqui está sendo verificado a data, se o usuário está colocando a data de um dia anterior etc...
-    const dataAtual = moment().tz('America/Sao_Paulo').format('YYYY-MM-DD');
-    const dataEscolhida = moment(data.Data).tz('America/Sao_Paulo').format('YYYY-MM-DD');
-    // console.log(Linkfiles)
-    if(dataAtual > dataEscolhida){
-        return { message:"Data inválida." }
-    }
-    ///////
-
-    const validaDataEvento = await prisma.eventos.findFirst({
-        where:{
-            OrganizacaoID: parseInt(data.OrganizacaoID),
-            Data:dataHoraBrasil
-        }
-    })
-
-    const quantidadeDeEventosDia = await prisma.eventos.count({
-        where:{
-            OrganizacaoID: parseInt(data.OrganizacaoID),
-                Data:{
-                    gte:new Date(dataBrasilInicio),
-                    lte:new Date(dataBrasilFim),
-                }
-        }
-    })
-
-    if(quantidadeDeEventosDia >= 3){
-        return {message:"Uma organização pode criar somente 3 eventos por dia."}
-    }
-
-    if(validaDataEvento){
-        return {message:"Evento já cadastrado nessa data"};
-    }
-    console.log('id', parseInt(data.OrganizacaoID))
      const eventoInserido = await prisma.eventos.create({
          data:{
              ...data,
              NumVoluntariosNecessarios: parseInt(data.NumVoluntariosNecessarios),
              OrganizacaoID: parseInt(data.OrganizacaoID),
              Data: new Date(data.Data),
-             fotoEvento: imageUploaded
+             fotoEvento: imageUploaded,
+             file:undefined
          }
      })
     return eventoInserido;
@@ -103,7 +63,7 @@ const criarCandidatura = async(data) => {
     })
 
     if(usuarioJaCadastradoNoEvento){
-        return {message:"você já está cadastrado nesse evento."}
+        return {error:"você já está cadastrado nesse evento."}
     }
 
     const eventoSemVagas = await prisma.candidaturas.count({
@@ -120,7 +80,7 @@ const criarCandidatura = async(data) => {
     console.log(quantiadeDePessoasNoEvento)
 //AQUI VAI SER VERIFICADO SE O EVENTOS JÁ ESTÁ CHEIO;
     if(eventoSemVagas >= quantiadeDePessoasNoEvento.NumVoluntariosNecessarios){
-        return {message:"Esse evento já está cheio"}
+        return {error:"Esse evento já está cheio"}
     }
 
     const candidatura = await prisma.candidaturas.create({

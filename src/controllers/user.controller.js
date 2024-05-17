@@ -5,6 +5,7 @@ const jwtSecret = 'voluntariado';
 const argon2 = require('argon2');
 const userRepository = require("../repositorys/user.repository");
 const isNumber = require("../utils/validaString");
+const moment = require('moment-timezone');
 
 const criaVoluntario = async (req, res) => {
     try{
@@ -133,7 +134,49 @@ const listaVoluntarios = async (req, res) => {
 
 const criarEvento = async(req, res) => {
     try{
-        const criaEvento = await repository.criarEvento(req.body, req.file.key);
+    const { Data, OrganizacaoID } = req.body;
+
+        const dataHoraBrasil = moment(Data).tz('America/Sao_Paulo').format();
+        const dataBrasil  = moment(Data).tz('America/Sao_Paulo')
+
+        const dataBrasilInicio = dataBrasil.startOf('day').format();
+        const dataBrasilFim = dataBrasil.endOf('day').format();
+        //Aqui está sendo verificado a data, se o usuário está colocando a data de um dia anterior etc...
+
+
+        const validaDataEvento = await prisma.eventos.findFirst({
+            where:{
+                OrganizacaoID: parseInt(OrganizacaoID),
+                Data:dataHoraBrasil
+            }
+        })
+
+        const quantidadeDeEventosDia = await prisma.eventos.count({
+            where:{
+                OrganizacaoID: parseInt(OrganizacaoID),
+                Data:{
+                    gte:new Date(dataBrasilInicio),
+                    lte:new Date(dataBrasilFim),
+                }
+            }
+        })
+
+        if(quantidadeDeEventosDia >= 3){
+            return res.status(400).send({error:"Uma organização pode criar somente 3 eventos por dia."})
+        }
+
+        if(validaDataEvento){
+            return res.status(400).send({error:"Evento já cadastrado nessa data"})
+        }
+
+        const dataAtual = moment().tz('America/Sao_Paulo').format('YYYY-MM-DD');
+        const dataEscolhida = moment(Data).tz('America/Sao_Paulo').format('YYYY-MM-DD');
+
+        if(dataAtual > dataEscolhida){
+            return res.status(400).send({ error:"Data inválida." })
+        }
+        // const uploadedFile = req.file.key
+        const criaEvento = await repository.criarEvento(req.body, req.file?.key);
         return res.status(200).send(criaEvento);
     }catch(e){
         console.log(e)
