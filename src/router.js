@@ -19,6 +19,7 @@ router.put('/atualizarCandidaturaRejeitado',taskController.atualizaCandidaturaPa
 router.put('/editarEvento',taskController.edicaoEvento);
 router.get('/eventosPorOrganizacao/',verificacaoJwt,taskController.eventosPorOrganizacao);
 router.get("/link-files/:fileId", fileUpload.linkFiles);
+router.get("/formDataEvento/:id", taskController.formDataEvento);
 
 router.post("/files", fileUpload.upload.single("file"), fileUpload.files);
 router.post('/criarEvento', fileUpload.upload.single("file"), taskController.criarEvento);

@@ -237,6 +237,16 @@ const eventosPorOrganizacao = async(req, res) => {
     }
 }
 
+const formDataEvento = async(req,res)=>{
+    try {
+        const eventoId = parseInt(req.params.id);
+        const dadosEvento = await userRepository.formDataEvento(eventoId);
+        return res.status(200).send(dadosEvento);
+    } catch (e) {
+        console.log(e)
+        return res.status(400).send({error: e});
+    }
+}
 
 
 module.exports = {
@@ -250,5 +260,6 @@ module.exports = {
     atualizaEstadoVoluntarioParaAceito,
     atualizaCandidaturaParaRejeitado,
     edicaoEvento,
-    eventosPorOrganizacao
+    eventosPorOrganizacao,
+    formDataEvento
 }

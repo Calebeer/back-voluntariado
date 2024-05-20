@@ -139,6 +139,17 @@ const eventosPorOrganizacao = async(id) => {
     return eventos
 }
 
+const formDataEvento = async(data)=>{
+    const dadosEvento = await prisma.eventos.findUnique({
+        where:{
+            ID:data
+        }
+    })
+    return dadosEvento;
+}
+
+
+
 module.exports = {
     criarVoluntario,
     criarOrganizacao,
@@ -148,5 +159,6 @@ module.exports = {
     atualizaCandidaturaAceito,
     atualizaCandidaturaRejeitado,
     edicaoEvento,
-    eventosPorOrganizacao
+    eventosPorOrganizacao,
+    formDataEvento
 }
